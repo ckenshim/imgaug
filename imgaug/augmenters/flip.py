@@ -55,9 +55,10 @@ class Fliplr(Augmenter): # pylint: disable=locally-disabled, unused-variable, li
 
     """
 
-    def __init__(self, p=0, name=None, deterministic=False, random_state=None):
+    def __init__(self, p=0, name=None, deterministic=False, random_state=None, preserve_order = False):
         super(Fliplr, self).__init__(name=name, deterministic=deterministic, random_state=random_state)
-
+	
+        self.preserve_order = preserve_order
         if ia.is_single_number(p):
             self.p = Binomial(p)
         elif isinstance(p, StochasticParameter):
@@ -81,6 +82,15 @@ class Fliplr(Augmenter): # pylint: disable=locally-disabled, unused-variable, li
                 width = keypoints_on_image.shape[1]
                 for keypoint in keypoints_on_image.keypoints:
                     keypoint.x = (width - 1) - keypoint.x
+                if self.preserve_order:
+                    if len(keypoints_on_image.keypoints) == 4:
+                        new_kp = []
+                        new_kp.append(keypoints_on_image.keypoints[1])
+                        new_kp.append(keypoints_on_image.keypoints[0])
+                        new_kp.append(keypoints_on_image.keypoints[3])
+                        new_kp.append(keypoints_on_image.keypoints[2])
+                        keypoints_on_image.keypoints = new_kp
+		    
         return keypoints_on_images
 
     def get_parameters(self):
@@ -117,9 +127,9 @@ class Flipud(Augmenter): # pylint: disable=locally-disabled, unused-variable, li
 
     """
 
-    def __init__(self, p=0, name=None, deterministic=False, random_state=None):
+    def __init__(self, p=0, name=None, deterministic=False, random_state=None, preserve_order = False):
         super(Flipud, self).__init__(name=name, deterministic=deterministic, random_state=random_state)
-
+        self.preserve_order = preserve_order
         if ia.is_single_number(p):
             self.p = Binomial(p)
         elif isinstance(p, StochasticParameter):
@@ -143,6 +153,14 @@ class Flipud(Augmenter): # pylint: disable=locally-disabled, unused-variable, li
                 height = keypoints_on_image.shape[0]
                 for keypoint in keypoints_on_image.keypoints:
                     keypoint.y = (height - 1) - keypoint.y
+                if self.preserve_order:
+                    if len(keypoints_on_image.keypoints) == 4:
+                        new_kp = []
+                        new_kp.append(keypoints_on_image.keypoints[3])
+                        new_kp.append(keypoints_on_image.keypoints[2])
+                        new_kp.append(keypoints_on_image.keypoints[1])
+                        new_kp.append(keypoints_on_image.keypoints[0])
+                        keypoints_on_image.keypoints = new_kp
         return keypoints_on_images
 
     def get_parameters(self):
